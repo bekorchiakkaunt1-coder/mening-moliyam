@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Tanga</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --bg:#F3EFE6;--card:#FFFFFF;--ink:#1C1B18;--mute:#6B665C;--line:#E2DCCD;
+  --g:#2E6A4C;--g-ink:#FBFAF6;--g-soft:#D5E7D8;--red:#B4432F;--red-soft:#F6DDD6;--amber:#B97A1E;--amber-soft:#F4E3C9;
+  --pl:90%;--pc:38%;--ps:55%;--shadow:0 1px 0 rgba(28,27,24,.08);
+}
+:root[data-theme=dark]{
+  --bg:#14171A;--card:#1E2226;--ink:#EEEBE3;--mute:#9C978B;--line:#2C3237;
+  --g:#5FB283;--g-ink:#0F1A14;--g-soft:#1F3A2C;--red:#E38B78;--red-soft:#3B2521;--amber:#E8A860;--amber-soft:#3A2E1B;
+  --pl:24%;--pc:30%;--ps:32%;--shadow:none;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --bg:#14171A;--card:#1E2226;--ink:#EEEBE3;--mute:#9C978B;--line:#2C3237;
+    --g:#5FB283;--g-ink:#0F1A14;--g-soft:#1F3A2C;--red:#E38B78;--red-soft:#3B2521;--amber:#E8A860;--amber-soft:#3A2E1B;
+    --pl:24%;--pc:30%;--ps:32%;--shadow:none;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Noto Sans",sans-serif;font-size:15px;line-height:1.4;-webkit-text-size-adjust:100%}
+button,input{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;padding:0}
+#app{max-width:480px;margin:0 auto;min-height:100%;padding:0 16px calc(84px + env(safe-area-inset-bottom))}
+.num{font-variant-numeric:tabular-nums}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 0 8px}
+.hdr h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+.sync{font-size:12px;color:var(--mute)}
+.sync.warn{color:var(--amber);font-weight:600}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{height:36px;border-radius:9px;font-weight:600;color:var(--mute)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.hero{background:var(--g);color:var(--g-ink);border-radius:20px;padding:18px;margin:6px 0 14px}
+:root[data-theme=dark] .hero{background:#234A37;color:#EEEBE3}
+.hero .lbl{font-size:13px;opacity:.85}
+.hero .big{font-size:clamp(30px,10vw,38px);font-weight:700;letter-spacing:-.02em;line-height:1.1;margin:2px 0}
+.hero .big.over{color:#FFD2C7}
+.hero .row{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;flex-wrap:wrap}
+.hero .pill{font-size:13px;background:rgba(255,255,255,.16);padding:5px 10px;border-radius:999px;white-space:nowrap}
+.bar{height:8px;border-radius:4px;background:rgba(255,255,255,.22);overflow:hidden;margin:12px 0 6px}
+.bar>i{display:block;height:100%;background:#FBFAF6;border-radius:4px}
+.hero .sub{font-size:13px;opacity:.9;display:flex;justify-content:space-between;gap:8px}
+.hero button.lnk{color:inherit;text-decoration:underline;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cc{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;min-height:96px;padding:12px;border-radius:16px;text-align:left;background:hsl(var(--h) var(--ps) var(--pl));color:var(--ink);overflow:hidden}
+.cc .emo{font-size:26px;line-height:1}
+.cc .nm{font-weight:600;font-size:14px;margin-top:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cc .am{font-size:13px;color:hsl(var(--h) 30% var(--pc));font-weight:600;min-height:18px}
+:root[data-theme=dark] .cc .am{color:hsl(var(--h) 45% 72%)}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;height:48px;padding:0 16px;border-radius:14px;background:var(--g);color:var(--g-ink);font-weight:600;width:100%}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:var(--red-soft);color:var(--red)}
+.btn.sm{height:40px;width:auto;font-size:14px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin:0 0 12px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 8px;font-size:15px}
+.mute{color:var(--mute)}
+.small{font-size:13px}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:6px 0}
+.kv+.kv{border-top:1px solid var(--line)}
+.pb{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0}
+.pb>i{display:block;height:100%;background:var(--g);border-radius:4px}
+.pb.over>i{background:var(--red)}
+.pb.warn>i{background:var(--amber)}
+.rowbtn{display:block;width:100%;text-align:left;padding:8px 0}
+.rowbtn+.rowbtn{border-top:1px solid var(--line)}
+/* yozuvlar */
+.mnav{display:flex;align-items:center;justify-content:space-between;margin:2px 0 10px}
+.mnav button{width:44px;height:44px;border-radius:12px;background:var(--card);font-size:18px}
+.mnav b{font-size:17px}
+.search{width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 14px;margin-bottom:10px}
+.dh{display:flex;justify-content:space-between;padding:12px 2px 6px;font-size:13px;color:var(--mute);font-weight:600}
+.tx{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;background:var(--card);border-radius:14px;margin-bottom:6px;min-height:56px}
+.tx .e{font-size:22px;width:32px;text-align:center}
+.tx .m{flex:1;min-width:0}
+.tx .m b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx .m span{font-size:12px;color:var(--mute);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx .a{font-weight:700;white-space:nowrap}
+.tx .a.inc{color:var(--g)}
+.tx.x{opacity:.55}
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:5}
+.nav>div{display:grid;grid-template-columns:repeat(5,1fr);width:100%;max-width:480px}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:2px;height:52px;justify-content:center;font-size:11px;color:var(--mute);font-weight:600;border-radius:12px}
+.nav button i{font-style:normal;font-size:20px;line-height:1}
+.nav button.on{color:var(--g)}
+/* entry sheet */
+.sheet{position:fixed;inset:0;background:var(--bg);z-index:10;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-top:env(safe-area-inset-top)}
+.sheet[hidden],#modal[hidden],#toast[hidden]{display:none}
+.sh-head{display:flex;align-items:center;gap:8px;padding:8px 12px}
+.sh-head .x{width:44px;height:44px;border-radius:12px;background:var(--card);font-size:18px}
+.sh-head .t{flex:1;font-weight:700;font-size:17px}
+.sh-head .md{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--g-soft);color:var(--g)}
+.sh-body{flex:1;min-height:0;overflow-y:auto;padding:0 16px}
+.amt{display:flex;align-items:baseline;gap:6px;justify-content:center;padding-top:6px}
+.amt .cur{font-size:26px;color:var(--mute);font-weight:600}
+.amt .v{font-size:52px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.amt.bad .v{color:var(--red)}
+.expr{text-align:center;min-height:20px;color:var(--mute);font-size:14px}
+.work{text-align:center;color:var(--g);font-weight:600;font-size:14px;min-height:20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+.chip{height:38px;padding:0 14px;border-radius:19px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:14px}
+.chip.on{background:var(--g);color:var(--g-ink);border-color:var(--g)}
+.chip.dash{border-style:dashed;color:var(--mute)}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px;align-items:center}
+.quick .chip{height:32px;font-size:13px;background:transparent}
+.noteinp{width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 14px;margin:6px 0}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.tool{position:relative;height:38px;padding:0 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.tool.on{background:var(--g-soft);border-color:var(--g);color:var(--g)}
+.tool input{position:absolute;inset:0;opacity:0;width:100%;height:100%}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 16px calc(12px + env(safe-area-inset-bottom));background:var(--bg)}
+.pad button{height:54px;border-radius:14px;background:var(--card);font-size:22px;font-weight:600;box-shadow:var(--shadow)}
+.pad button.op{background:var(--g-soft);color:var(--g)}
+.pad button.ok{background:var(--g);color:var(--g-ink);font-size:26px}
+.pad button:active{transform:scale(.97)}
+.linkbtn{color:var(--red);font-weight:600;padding:10px 0}
+/* modal, toast */
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+#modal .box{width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom))}
+#modal h3{margin:0 0 4px}
+#modal input{width:100%;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 14px;margin:10px 0}
+#modal .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));max-width:456px;margin:0 auto;background:#1C1B18;color:#F3EFE6;border-radius:14px;padding:12px 14px;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px}
+#toast button{color:#9BD6B2;font-weight:700;white-space:nowrap}
+.fatal{padding:80px 24px;text-align:center}
+.fatal h2{margin:8px 0}
+.empty{text-align:center;color:var(--mute);padding:28px 8px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--amber-soft);color:var(--amber)}
+.field{display:grid;gap:8px;margin-top:8px}
+.field input{height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 14px;width:100%}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="sheet" class="sheet" hidden></div>
+<div id="modal" hidden></div>
+<div id="toast" hidden></div>
+<script>
+'use strict';
+/* ============================ SOZLAMA ============================
+   API_URL: Apps Script "Web app" /exec manzili. Bo'sh qoldirsangiz — demo rejim
+   (ma'lumot faqat shu brauzerda turadi, hech qayerga yuborilmaydi). */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzJLsOkGRLVqfnkv67BoOzoO3unHpxnpZVMLEVV7gGrswY1288bN1th1gXyq4enhYpa/exec';
+
+const tg = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== undefined ? window.Telegram.WebApp : null;
+const DEMO = !API_URL || /[?&]demo=1/.test(location.search);
+const MONTHS = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
+const DAYS = ['Yakshanba', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
+const HUES = [24, 140, 215, 330, 48, 265, 185, 8, 95, 300, 160, 35];
+
+const S = {
+  tab: 'home', mode: 'exp', period: 'day', tz: 'Asia/Seoul', month: '', q: '', full: false, from: '',
+  cats: { exp: [], inc: [] }, entries: [], recurring: [], wishes: [], marks: [], sheetUrl: '',
+  settings: { soat_stavka: '13000', oylik_byudjet: '0' }, online: true, ready: false, fatal: ''
+};
+let outbox = [];
+let flushing = false;
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const won = n => fmt(n) + '₩';
+const rate = () => Number(S.settings.soat_stavka) > 0 ? Number(S.settings.soat_stavka) : 13000;
+const budget = () => Number(S.settings.oylik_byudjet) || 0;
+function workStr(amount) {
+  const m = Math.round(Math.abs(amount) / rate() * 60);
+  if (m < 60) return m + ' daqiqa';
+  const h = Math.floor(m / 60), r = m % 60;
+  return r ? h + ' soat ' + r + ' daq' : h + ' soat';
+}
+function parts() {
+  const p = {};
+  new Intl.DateTimeFormat('en-CA', { timeZone: S.tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    .formatToParts(new Date()).forEach(x => { p[x.type] = x.value; });
+  return { date: p.year + '-' + p.month + '-' + p.day, time: p.hour + ':' + p.minute };
+}
+const today = () => parts().date;
+const uid = () => (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)).slice(-14);
+const utc = ymd => Date.UTC(+ymd.slice(0, 4), +ymd.slice(5, 7) - 1, +ymd.slice(8, 10));
+const dow = ymd => new Date(utc(ymd)).getUTCDay();
+const addDays = (ymd, n) => new Date(utc(ymd) + n * 86400000).toISOString().slice(0, 10);
+const daysIn = ymd => new Date(+ymd.slice(0, 4), +ymd.slice(5, 7), 0).getDate();
+function addMonth(ym, n) { let y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1 + n; y += Math.floor(m / 12); m = ((m % 12) + 12) % 12; return y + '-' + String(m + 1).padStart(2, '0'); }
+const monthName = ym => MONTHS[+ym.slice(5, 7) - 1] + ' ' + ym.slice(0, 4);
+const haptic = k => { try { tg && tg.HapticFeedback && (k === 'ok' ? tg.HapticFeedback.notificationOccurred('success') : tg.HapticFeedback.impactOccurred('light')); } catch (e) {} };
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+/* ============================ DEMO BACKEND ============================ */
+const DEMO_CATS = {
+  exp: [
+    ['Ovqat', '🍜', 'Nonushta,Tushlik,Kechki ovqat,Gazak,Kofe,Alkogol,Market', 'sarf'], ['Transport', '🚇', "Metro/avtobus,Taksi,T-money,Yoqilg'i,Parkovka", 'sarf'],
+    ['Uy', '🏠', 'Ijara,Kommunal,Elektr,Gaz,Suv,Internet,Telefon', 'doimiy'], ['Parvarish', '💇', 'Sartarosh,Manikyur,Massaj,Kosmetika', 'sarf'],
+    ['Xarid', '🛍', 'Kiyim,Poyabzal,Sumka,Elektronika,Aksessuar', 'sarf'], ["Sog'liq", '💊', 'Dorixona,Vitamin,Shifoxona,Tish', 'sarf'],
+    ["Ko'ngilochar", '🎤', "Kino,O'yin,Obuna,Sayohat", 'sarf'], ["Ta'lim", '🎓', 'Kurs,Kitob,Imtihon', 'sarf'],
+    ['Uyga pul', '🏡', "Oilaga,Jamg'arma", 'doimiy'], ['Berilgan qarz', '📤', '', 'qarz'], ['Boshqa', '📦', "Sovg'a,Xayriya,Boshqa", 'sarf']
+  ],
+  inc: [
+    ['Ish haqi', '💼', 'Ish soati,Bonus,Stipendiya,Komissiya', 'sarf'], ['Frilans', '💻', 'Loyiha,Maslahat', 'sarf'], ['Investitsiya', '📈', 'Foiz,Dividend,Sotuv', 'sarf'],
+    ["Sovg'a", '🎁', "Oiladan,Do'stdan", 'sarf'], ['Olingan qarz', '📥', '', 'qarz']
+  ]
+};
+const demo = {
+  db: null,
+  load() {
+    if (this.db) return this.db;
+    let db = lsGet('tanga_demo', null);
+    if (!db) {
+      const cats = {};
+      ['exp', 'inc'].forEach(t => { cats[t] = DEMO_CATS[t].map(c => ({ nom: c[0], emoji: c[1], subs: c[2] ? c[2].split(',') : [], limit: 0, hisob: c[3] })); });
+      cats.exp[0].limit = 200000;
+      const t = today(), E = [];
+      const add = (back, tur, summa, kategoriya, sub, izoh) => E.push({ id: uid() + E.length, sana: addDays(t, -back), vaqt: '12:30', tur, summa, kategoriya, sub: sub || '', izoh: izoh || '', ish_daq: Math.round(summa / 13000 * 60), hisobsiz: 0, takroriy: 0 });
+      [[0, 4500, 'Kofe'], [0, 8000, 'Tushlik'], [1, 32000, 'Kechki ovqat'], [1, 4200, 'Kofe'], [2, 6500, 'Tushlik'], [3, 22000, 'Market'], [4, 5000, 'Kofe'], [5, 9000, 'Tushlik'],
+        [6, 41000, 'Kechki ovqat'], [8, 7000, 'Tushlik'], [9, 4500, 'Kofe'], [12, 15000, 'Gazak'], [15, 8500, 'Tushlik'], [20, 29000, 'Market']]
+        .forEach(x => add(x[0], 'exp', x[1], 'Ovqat', x[2]));
+      [[0, 1250, 'Metro/avtobus'], [1, 1250, 'Metro/avtobus'], [1, 1250, 'Metro/avtobus'], [2, 12500, 'Taksi'], [5, 1250, 'Metro/avtobus'], [10, 20000, 'T-money']].forEach(x => add(x[0], 'exp', x[1], 'Transport', x[2]));
+      add(2, 'exp', 15000, 'Parvarish', 'Sartarosh'); add(7, 'exp', 25000, 'Uy', 'Telefon'); add(3, 'exp', 58000, 'Xarid', 'Kiyim'); add(11, 'exp', 14000, "Ko'ngilochar", 'Kino');
+      add(4, 'exp', 20000, 'Berilgan qarz', "Do'stim"); add(6, 'inc', 78000, 'Ish haqi', 'Ish soati', '6 soat'); add(13, 'inc', 156000, 'Ish haqi', 'Ish soati', '12 soat');
+      db = { cats, entries: E, settings: { soat_stavka: '13000', oylik_byudjet: '600000' }, wishes: [{ id: 'w1', sana: addDays(t, -1), nom: 'Quloqchin', summa: 89000, holat: 'kutmoqda' }], recurring: [], marks: [] };
+    }
+    return (this.db = db);
+  },
+  save() { lsSet('tanga_demo', this.db); },
+  api(action, d) {
+    const db = this.load();
+    const clone = o => JSON.parse(JSON.stringify(o));
+    if (action === 'boot') return { v: 'demo', today: today(), tz: S.tz, from: d.from || '', settings: clone(db.settings), cats: clone(db.cats), entries: clone(db.entries.filter(e => !d.from || e.sana >= d.from)), recurring: clone(db.recurring), wishes: clone(db.wishes), marks: [], sheetUrl: '' };
+    if (action === 'add') {
+      if (!db.entries.find(e => e.id === d.id)) {
+        const cat = db.cats[d.tur].find(c => c.nom === d.kategoriya);
+        if (cat && d.sub && cat.subs.indexOf(d.sub) < 0) cat.subs.push(d.sub);
+        db.entries.push(Object.assign({}, d, { ish_daq: Math.round(d.summa / rate() * 60) }));
+        if (d.takroriy && !db.recurring.find(r => r.kategoriya === d.kategoriya && r.sub === d.sub && r.summa === d.summa)) db.recurring.push({ id: uid(), tur: d.tur, kategoriya: d.kategoriya, sub: d.sub, summa: d.summa, izoh: d.izoh, kun: +d.sana.slice(8) });
+      }
+    } else if (action === 'upd') {
+      const e = db.entries.find(x => x.id === d.id);
+      if (e) { Object.assign(e, d); e.ish_daq = Math.round(e.summa / rate() * 60); }
+    } else if (action === 'del') db.entries = db.entries.filter(e => e.id !== d.id);
+    else if (action === 'set') Object.keys(d).forEach(k => { db.settings[k] = String(Math.round(d[k])); });
+    else if (action === 'cat') { const c = db.cats[d.tur === 'inc' ? 'inc' : 'exp'].find(x => x.nom === d.nom); if (c && d.limit != null) c.limit = d.limit; }
+    else if (action === 'wishAdd') db.wishes.push({ id: d.id, sana: today(), nom: d.nom, summa: d.summa, holat: 'kutmoqda' });
+    else if (action === 'wishSet') { const w = db.wishes.find(x => x.id === d.id); if (w) w.holat = d.holat; }
+    else if (action === 'subOff') db.recurring = db.recurring.filter(r => r.id !== d.id);
+    this.save();
+    return {};
+  }
+};
+
+/* ============================ API + OFFLINE NAVBAT ============================ */
+const FATAL = { auth: 'Sessiya tasdiqlanmadi', eskirgan: 'Sessiya eskirdi', "ruxsat yo'q": "Bu ilova faqat egasi uchun", sozlanmagan: 'Backend sozlanmagan (BOT_TOKEN / OWNER_ID)' };
+async function callApi(action, data) {
+  if (DEMO) { await new Promise(r => setTimeout(r, 120)); return demo.api(action, data || {}); }
+  const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), 25000);
+  let j;
+  try {
+    const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, data: data || {}, initData: tg ? tg.initData : '' }), signal: ctrl.signal, redirect: 'follow' });
+    j = await res.json();
+  } catch (e) { const er = new Error('net'); er.net = true; throw er; } finally { clearTimeout(to); }
+  if (!j || !j.ok) { const er = new Error((j && j.error) || 'server'); er.server = true; throw er; }
+  return j.data;
+}
+const saveOutbox = () => lsSet('tanga_outbox', outbox);
+function queue(a, d) { outbox.push({ a, d }); saveOutbox(); flush(); }
+async function flush() {
+  if (flushing) return;
+  flushing = true;
+  let reload = false;
+  try {
+    while (outbox.length) {
+      const op = outbox[0];
+      try { await callApi(op.a, op.d); outbox.shift(); saveOutbox(); S.online = true; }
+      catch (e) {
+        if (e.net || e.message === 'server') { S.online = false; break; }
+        if (FATAL[e.message]) { S.fatal = e.message; break; }
+        outbox.shift(); saveOutbox(); reload = true; toast('⚠ ' + e.message);
+      }
+    }
+  } finally { flushing = false; }
+  if (reload) return boot();
+  if (S.ready) renderSync();
+}
+window.addEventListener('online', () => flush());
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { flush(); } });
+
+function persist() { lsSet('tanga_cache', { cats: S.cats, entries: S.entries, settings: S.settings, recurring: S.recurring, wishes: S.wishes, marks: S.marks, tz: S.tz, sheetUrl: S.sheetUrl, from: S.from }); }
+function applyOutbox() {
+  outbox.forEach(op => {
+    if (op.a === 'add' && !S.entries.find(e => e.id === op.d.id)) S.entries.push(Object.assign({ ish_daq: Math.round(op.d.summa / rate() * 60) }, op.d));
+    else if (op.a === 'upd') { const e = S.entries.find(x => x.id === op.d.id); if (e) Object.assign(e, op.d); }
+    else if (op.a === 'del') S.entries = S.entries.filter(e => e.id !== op.d.id);
+    else if (op.a === 'set') Object.assign(S.settings, Object.fromEntries(Object.entries(op.d).map(([k, v]) => [k, String(v)])));
+  });
+}
+async function boot(from) {
+  await flush();
+  try {
+    const d = await callApi('boot', from ? { from } : {});
+    S.tz = d.tz || S.tz; S.cats = d.cats; S.settings = Object.assign(S.settings, d.settings); S.entries = d.entries;
+    S.recurring = d.recurring || []; S.wishes = d.wishes || []; S.marks = d.marks || []; S.sheetUrl = d.sheetUrl || ''; S.from = d.from || '';
+    S.online = true;
+    applyOutbox(); persist();
+  } catch (e) {
+    if (FATAL[e.message]) S.fatal = e.message; else S.online = false;
+  }
+  S.ready = true;
+  render();
+}
+async function ensureFull() { if (S.full || DEMO) { S.full = true; return; } S.full = true; await boot('2000-01-01'); }
+
+/* ============================ HISOB-KITOB ============================ */
+const catOf = (tur, nom) => S.cats[tur].find(c => c.nom === nom);
+const kindOf = (tur, nom) => (catOf(tur, nom) || { hisob: 'sarf' }).hisob;
+function stats() {
+  const t = today(), ym = t.slice(0, 7);
+  const o = { total: 0, income: 0, todayAll: 0, freeBefore: 0, freeToday: 0, byCat: {}, byCatDay: {}, incBy: {}, incByDay: {}, spendDays: {} };
+  S.entries.forEach(e => {
+    if (e.hisobsiz || e.sana.slice(0, 7) !== ym) return;
+    const k = kindOf(e.tur, e.kategoriya);
+    if (k === 'qarz') return;
+    if (e.tur === 'inc') { o.income += e.summa; o.incBy[e.kategoriya] = (o.incBy[e.kategoriya] || 0) + e.summa; if (e.sana === t) o.incByDay[e.kategoriya] = (o.incByDay[e.kategoriya] || 0) + e.summa; return; }
+    o.total += e.summa; o.byCat[e.kategoriya] = (o.byCat[e.kategoriya] || 0) + e.summa; o.spendDays[e.sana] = 1;
+    if (e.sana === t) { o.todayAll += e.summa; o.byCatDay[e.kategoriya] = (o.byCatDay[e.kategoriya] || 0) + e.summa; }
+    if (k === 'sarf') { if (e.sana < t) o.freeBefore += e.summa; else if (e.sana === t) o.freeToday += e.summa; }
+  });
+  const dim = daysIn(t), dayN = +t.slice(8), daysLeft = dim - dayN + 1, b = budget();
+  o.dim = dim; o.dayN = dayN; o.daysLeft = daysLeft; o.budget = b;
+  o.allowance = b > 0 ? Math.max(0, Math.floor((b - o.freeBefore) / daysLeft)) : 0;
+  o.leftToday = o.allowance - o.freeToday;
+  o.freeMonth = o.freeBefore + o.freeToday;
+  return o;
+}
+function streak() {
+  const set = {}; S.entries.forEach(e => { set[e.sana] = 1; }); S.marks.forEach(m => { set[m] = 1; });
+  let d = today(), n = 0;
+  if (!set[d]) d = addDays(d, -1);
+  while (set[d]) { n++; d = addDays(d, -1); }
+  return n;
+}
+
+/* ============================ UI: RENDER ============================ */
+const NAV = [['home', '🏠', 'Bosh'], ['list', '🧾', 'Yozuvlar'], ['budget', '📊', 'Byudjet'], ['wish', '✨', 'Xohish'], ['set', '⚙️', 'Sozlama']];
+function render() {
+  const app = $('#app');
+  if (S.fatal) {
+    app.innerHTML = '<div class="fatal"><div style="font-size:44px">🔒</div><h2>' + esc(FATAL[S.fatal] || S.fatal) + '</h2><p class="mute">Ilovani bot ichidagi tugma orqali qayta oching.</p></div>';
+    return;
+  }
+  const views = { home: vHome, list: vList, budget: vBudget, wish: vWish, set: vSet };
+  const title = { home: 'Tanga', list: 'Yozuvlar', budget: 'Byudjet', wish: 'Xohishlar', set: 'Sozlama' }[S.tab];
+  app.innerHTML = '<div class="hdr"><h1>' + title + '</h1><span class="sync" id="sync"></span></div>' + (S.ready ? views[S.tab]() : '<div class="empty">Yuklanmoqda…</div>') +
+    '<nav class="nav"><div>' + NAV.map(n => '<button data-act="tab" data-t="' + n[0] + '" class="' + (S.tab === n[0] ? 'on' : '') + '"><i>' + n[1] + '</i>' + n[2] + '</button>').join('') + '</div></nav>';
+  renderSync();
+}
+function renderSync() {
+  const el = $('#sync'); if (!el) return;
+  const n = outbox.length;
+  el.className = 'sync' + (n || !S.online ? ' warn' : '');
+  el.textContent = DEMO ? 'demo rejim' : (n ? '⏳ ' + n + ' ta yuborilmagan' : (!S.online ? 'oflayn' : ''));
+}
+
+function vHome() {
+  const st = stats(), r = rate();
+  let hero;
+  if (!st.budget) {
+    hero = '<div class="hero"><div class="lbl">Kunlik me\'yor</div><div class="big">—</div><div class="sub"><span>Oylik byudjetni belgilang, men har kuni necha ₩ ishlatish mumkinligini aytaman</span></div><div style="margin-top:10px"><button class="btn ghost sm" data-act="setBudget">Byudjet belgilash</button></div></div>';
+  } else {
+    const over = st.leftToday < 0, pct = Math.min(100, Math.round(st.freeBefore / st.budget * 100));
+    const shown = over ? -st.leftToday : st.leftToday;
+    const tomorrow = st.daysLeft > 1 ? Math.max(0, Math.floor((st.budget - st.freeMonth) / (st.daysLeft - 1))) : 0;
+    hero = '<div class="hero"><div class="row"><div><div class="lbl">' + (over ? "Kunlik me'yordan oshdi" : 'Bugun yana ishlatsa bo\'ladi') + '</div>' +
+      '<div class="big num ' + (over ? 'over' : '') + '">' + (over ? '−' : '') + won(shown) + '</div></div><div class="pill">≈ ' + workStr(shown) + ' ish</div></div>' +
+      '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="sub num"><span>Erkin byudjet ' + fmt(st.freeBefore) + ' / ' + fmt(st.budget) + '</span><span>' + (st.daysLeft > 1 ? 'Ertaga ' + won(tomorrow) : 'Oy oxirgi kuni') + '</span></div></div>';
+  }
+  const list = S.cats[S.mode];
+  const amounts = S.mode === 'exp' ? (S.period === 'day' ? st.byCatDay : st.byCat) : (S.period === 'day' ? st.incByDay : st.incBy);
+  const cards = list.map((c, i) => '<button class="cc" data-act="cat" data-nom="' + esc(c.nom) + '" style="--h:' + HUES[i % HUES.length] + '"><span class="emo">' + esc(c.emoji) + '</span><span><span class="nm" style="display:block">' + esc(c.nom) + '</span><span class="am num">' + (amounts[c.nom] ? fmt(amounts[c.nom]) : '&nbsp;') + '</span></span></button>').join('');
+  const extra = S.mode === 'inc' ? '<div style="margin-top:12px"><button class="btn ghost" data-act="hours">⏱ Ish soatini yozish (1 soat = ' + won(r) + ')</button></div>' : '';
+  const sn = streak();
+  return hero +
+    '<div class="seg" style="margin-bottom:8px"><button data-act="mode" data-m="exp" class="' + (S.mode === 'exp' ? 'on' : '') + '">Xarajat</button><button data-act="mode" data-m="inc" class="' + (S.mode === 'inc' ? 'on' : '') + '">Daromad</button></div>' +
+    '<div class="seg"><button data-act="period" data-p="day" class="' + (S.period === 'day' ? 'on' : '') + '">Bugun</button><button data-act="period" data-p="month" class="' + (S.period === 'month' ? 'on' : '') + '">Shu oy</button></div>' +
+    '<div class="grid ' + (S.mode === 'inc' ? 'two' : '') + '">' + cards + '</div>' + extra +
+    (sn >= 2 ? '<p class="small mute" style="text-align:center;margin-top:16px">🔥 ' + sn + ' kun ketma-ket yozding</p>' : '');
+}
+
+function listEntries() {
+  const ym = S.month || (S.month = today().slice(0, 7)), q = S.q.trim().toLowerCase();
+  return S.entries.filter(e => e.sana.slice(0, 7) === ym && (!q || (e.kategoriya + ' ' + e.sub + ' ' + e.izoh + ' ' + e.summa).toLowerCase().indexOf(q) >= 0))
+    .sort((a, b) => (a.sana === b.sana ? (a.vaqt < b.vaqt ? 1 : -1) : a.sana < b.sana ? 1 : -1));
+}
+function vListBody() {
+  const items = listEntries();
+  if (!items.length) return '<div class="empty">Bu oyda yozuv yo\'q</div>';
+  let out = '', cur = '', exp = 0, inc = 0;
+  const pend = {}; outbox.forEach(o => { if (o.d && o.d.id) pend[o.d.id] = 1; });
+  const dayTot = {};
+  items.forEach(e => { if (e.tur === 'exp' && !e.hisobsiz && kindOf('exp', e.kategoriya) !== 'qarz') dayTot[e.sana] = (dayTot[e.sana] || 0) + e.summa; });
+  items.forEach(e => {
+    if (!e.hisobsiz && kindOf(e.tur, e.kategoriya) !== 'qarz') { if (e.tur === 'exp') exp += e.summa; else inc += e.summa; }
+    if (e.sana !== cur) { cur = e.sana; out += '<div class="dh"><span>' + +e.sana.slice(8) + ' · ' + DAYS[dow(e.sana)] + '</span><span class="num">' + (dayTot[e.sana] ? '−' + fmt(dayTot[e.sana]) : '') + '</span></div>'; }
+    const c = catOf(e.tur, e.kategoriya);
+    out += '<button class="tx ' + (e.hisobsiz ? 'x' : '') + '" data-act="edit" data-id="' + esc(e.id) + '"><span class="e">' + esc(c ? c.emoji : '📦') + '</span><span class="m"><b>' + esc(e.kategoriya) + (e.sub ? ' › ' + esc(e.sub) : '') + '</b><span>' + esc(e.vaqt) + (e.izoh ? ' · ' + esc(e.izoh) : '') + (e.takroriy ? ' · 🔁' : '') + (e.hisobsiz ? ' · 🚫' : '') + (pend[e.id] ? ' · ⏳' : '') + '</span></span><span class="a num ' + e.tur + '">' + (e.tur === 'inc' ? '+' : '−') + fmt(e.summa) + '</span></button>';
+  });
+  return '<div class="card" style="display:flex;justify-content:space-between;gap:8px"><div><div class="small mute">Xarajat</div><b class="num">' + won(exp) + '</b></div><div><div class="small mute">Daromad</div><b class="num" style="color:var(--g)">' + won(inc) + '</b></div><div style="text-align:right"><div class="small mute">Farq</div><b class="num">' + (inc - exp < 0 ? '−' : '+') + won(Math.abs(inc - exp)) + '</b></div></div>' + out;
+}
+function vList() {
+  const ym = S.month || (S.month = today().slice(0, 7));
+  return '<div class="mnav"><button data-act="mprev" aria-label="Oldingi oy">‹</button><b>' + monthName(ym) + '</b><button data-act="mnext" aria-label="Keyingi oy">›</button></div>' +
+    '<input class="search" id="q" placeholder="Qidirish: kofe, 4500, izoh…" value="' + esc(S.q) + '" autocomplete="off"><div id="listbody">' + vListBody() + '</div>';
+}
+
+function vBudget() {
+  const st = stats(), r = rate();
+  const proj = st.dayN >= 3 ? Math.round(st.freeMonth / st.dayN * st.dim) : 0;
+  const b = st.budget;
+  let top = '<div class="card"><h3>Shu oy · erkin byudjet</h3>';
+  if (!b) top += '<p class="mute small">Byudjet belgilanmagan.</p><button class="btn sm" data-act="setBudget">Belgilash</button>';
+  else {
+    const pct = Math.min(100, Math.round(st.freeMonth / b * 100));
+    top += '<div class="kv"><span>Reja</span><b class="num">' + won(b) + '</b></div><div class="kv"><span>Sarflandi</span><b class="num">' + won(st.freeMonth) + '</b></div><div class="kv"><span>Qoldi</span><b class="num" style="color:' + (b - st.freeMonth < 0 ? 'var(--red)' : 'var(--g)') + '">' + (b - st.freeMonth < 0 ? '−' : '') + won(Math.abs(b - st.freeMonth)) + '</b></div>' +
+      '<div class="pb ' + (pct >= 100 ? 'over' : pct >= 85 ? 'warn' : '') + '"><i style="width:' + pct + '%"></i></div>' +
+      '<p class="small mute" style="margin:6px 0 0">Ijara kabi doimiy xarajatlar (🏠 Uy, 🏡 Uyga pul) va qarzlar bu hisobga kirmaydi.' + (proj ? ' Shu sur\'atda oy oxirigacha: <b class="num">' + won(proj) + '</b> (' + (proj > b ? 'byudjetdan ' + won(proj - b) + ' ko\'p' : 'byudjet ichida') + ').' : '') + '</p>' +
+      '<div style="margin-top:8px"><button class="btn ghost sm" data-act="setBudget">O\'zgartirish</button></div>';
+  }
+  top += '</div>';
+  const rows = S.cats.exp.filter(c => c.hisob !== 'qarz').map(c => ({ c, v: st.byCat[c.nom] || 0 })).filter(x => x.v > 0 || x.c.limit > 0).sort((a, b) => b.v - a.v);
+  const catCard = '<div class="card"><h3>Kategoriyalar · shu oy</h3>' + (rows.length ? rows.map(x => {
+    const lim = x.c.limit, pct = lim ? Math.min(100, Math.round(x.v / lim * 100)) : (st.total ? Math.round(x.v / st.total * 100) : 0);
+    return '<button class="rowbtn" data-act="limit" data-nom="' + esc(x.c.nom) + '"><div class="kv" style="padding:0"><span>' + esc(x.c.emoji) + ' ' + esc(x.c.nom) + '</span><b class="num">' + fmt(x.v) + (lim ? ' / ' + fmt(lim) : '') + '</b></div><div class="pb ' + (lim && x.v > lim ? 'over' : lim && x.v > lim * .85 ? 'warn' : '') + '"><i style="width:' + pct + '%"></i></div></button>';
+  }).join('') + '<p class="small mute" style="margin:6px 0 0">Limit qo\'yish uchun kategoriyani bosing.</p>' : '<p class="mute small">Hali xarajat yo\'q.</p>') + '</div>';
+  // qarzlar
+  const debt = {};
+  S.entries.forEach(e => {
+    if (e.kategoriya === 'Berilgan qarz' && e.tur === 'exp') debt[e.sub || '—'] = (debt[e.sub || '—'] || 0) + e.summa;
+    if (e.kategoriya === 'Olingan qarz' && e.tur === 'inc') debt[e.sub || '—'] = (debt[e.sub || '—'] || 0) - e.summa;
+  });
+  const dn = Object.keys(debt).filter(k => debt[k] !== 0);
+  const debtCard = dn.length ? '<div class="card"><h3>Qarzlar</h3>' + dn.map(k => '<div class="kv"><span>' + esc(k) + '</span><b class="num" style="color:' + (debt[k] > 0 ? 'var(--g)' : 'var(--red)') + '">' + (debt[k] > 0 ? 'senga ' : 'sen ') + won(Math.abs(debt[k])) + ' qarz</b></div>').join('') + (S.full ? '' : '<p class="small mute" style="margin:6px 0 0">Eski yozuvlar yuklanmoqda…</p>') + '</div>' : '';
+  const insight = '<div class="card"><h3>Ish soatlarida</h3><div class="kv"><span>Daromad</span><b class="num">' + workStr(st.income) + '</b></div><div class="kv"><span>Xarajat</span><b class="num">' + workStr(st.total) + '</b></div><div class="kv"><span>Xarajatsiz kunlar</span><b class="num">' + Math.max(0, st.dayN - Object.keys(st.spendDays).length) + ' / ' + st.dayN + '</b></div></div>';
+  return top + catCard + debtCard + insight;
+}
+
+function wishLeft(w) { return Math.max(0, 2 - Math.round((utc(today()) - utc(w.sana)) / 86400000)); }
+function vWish() {
+  const pend = S.wishes.filter(w => w.holat === 'kutmoqda'), skipped = S.wishes.filter(w => w.holat === 'voz');
+  const saved = skipped.reduce((s, w) => s + w.summa, 0);
+  return '<div class="card"><h3>Yangi xohish</h3><p class="small mute" style="margin:0">Xohlagan narsangni yoz. 48 soatdan keyin "hali ham kerakmi?" deb so\'rayman.</p><div class="field"><input id="wn" placeholder="Nima? (masalan: quloqchin)" maxlength="60"><input id="wa" inputmode="numeric" placeholder="Narxi, ₩"></div><div style="margin-top:10px"><button class="btn" data-act="wishAdd">Yozib qo\'yish</button></div></div>' +
+    (skipped.length ? '<div class="card" style="background:var(--g-soft)"><h3>Voz kechding 🎉</h3><b class="num">' + skipped.length + ' ta · ' + won(saved) + '</b><div class="small mute">= ' + workStr(saved) + ' ish tejaldi</div></div>' : '') +
+    '<h3 style="margin:14px 2px 8px;font-size:15px">Kutilmoqda</h3>' + (pend.length ? pend.map(w => {
+      const left = wishLeft(w);
+      return '<div class="card"><div class="kv" style="padding:0"><b>' + esc(w.nom) + '</b><b class="num">' + won(w.summa) + '</b></div><div class="small mute">= ' + workStr(w.summa) + ' ish · ' + (left > 0 ? left + ' kundan keyin so\'raladi' : '<span class="tag">endi qaror qil</span>') + '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><button class="btn ghost sm" data-act="wishBuy" data-id="' + esc(w.id) + '">Sotib oldim</button><button class="btn sm" data-act="wishSkip" data-id="' + esc(w.id) + '">Kerak emas</button></div></div>';
+    }).join('') : '<div class="empty">Hozircha yo\'q</div>');
+}
+
+function vSet() {
+  const rec = S.recurring.map(r => '<div class="kv"><span>' + esc(r.kategoriya) + (r.sub ? ' › ' + esc(r.sub) : '') + ' <span class="mute small">· har oy ' + r.kun + '-kuni</span></span><span><b class="num">' + fmt(r.summa) + '</b> <button data-act="recOff" data-id="' + esc(r.id) + '" aria-label="O\'chirish" style="padding:6px 8px">✕</button></span></div>').join('');
+  return '<div class="card"><div class="kv"><span>Soatlik stavka</span><button data-act="setRate"><b class="num">' + won(rate()) + '</b> ›</button></div><div class="kv"><span>Oylik erkin byudjet</span><button data-act="setBudget"><b class="num">' + won(budget()) + '</b> ›</button></div><p class="small mute" style="margin:6px 0 0">Stavka har xarajat yonida "≈ N daqiqa ishing" ni hisoblaydi.</p></div>' +
+    '<div class="card"><h3>Takroriy to\'lovlar</h3>' + (rec || '<p class="small mute" style="margin:0">Yo\'q. Yozuv qo\'shayotganda 🔁 Takroriy ni yoqsang, u har oy o\'zi yoziladi.</p>') + '</div>' +
+    '<div class="card"><h3>Ma\'lumot</h3>' + (S.sheetUrl ? '<button class="btn ghost" data-act="sheet">📗 Google Sheets ni ochish</button><p class="small mute">Kategoriya va ichki turlarni Sheets\'dagi "Kategoriyalar" varag\'ida tahrirlaysan.</p>' : '<p class="small mute" style="margin:0">' + (DEMO ? 'Demo rejim: ma\'lumot faqat shu brauzerda.' : '') + '</p>') + '<button class="btn ghost" style="margin-top:8px" data-act="sync">🔄 Yangilash</button></div>' +
+    (DEMO ? '<div class="card"><button class="btn danger" data-act="demoReset">Demo ma\'lumotni tozalash</button></div>' : '');
+}
+
+/* ============================ TOAST / MODAL ============================ */
+let toastTimer;
+function toast(text, undo) {
+  const el = $('#toast'); el.hidden = false;
+  el.innerHTML = '<span>' + esc(text) + '</span>' + (undo ? '<button id="tundo">↩ Bekor</button>' : '');
+  if (undo) $('#tundo').onclick = () => { el.hidden = true; undo(); };
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, undo ? 7000 : 3500);
+}
+function ask(o) {
+  return new Promise(res => {
+    const m = $('#modal'); m.hidden = false;
+    m.innerHTML = '<div class="box"><h3>' + esc(o.title) + '</h3>' + (o.hint ? '<div class="small mute">' + esc(o.hint) + '</div>' : '') +
+      '<input id="mi" value="' + esc(o.value || '') + '" ' + (o.num ? 'inputmode="numeric"' : '') + ' placeholder="' + esc(o.ph || '') + '" maxlength="60" autocomplete="off"><div class="two"><button class="btn ghost" id="mc">Bekor</button><button class="btn" id="mo">' + esc(o.ok || 'Saqlash') + '</button></div></div>';
+    const done = v => { m.hidden = true; m.innerHTML = ''; res(v); };
+    $('#mc').onclick = () => done(null); $('#mo').onclick = () => done($('#mi').value.trim());
+    m.onclick = e => { if (e.target === m) done(null); };
+    $('#mi').onkeydown = e => { if (e.key === 'Enter') done($('#mi').value.trim()); };
+    setTimeout(() => { const i = $('#mi'); if (i) i.focus(); }, 50);
+  });
+}
+const numOf = s => Math.round(Number(String(s || '').replace(/[^\d.]/g, '')) || 0);
+
+/* ============================ YOZUV OYNASI (keypad) ============================ */
+let E = null;
+const OPS = /[+−]/;
+function evalExpr(s) {
+  if (!s) return 0;
+  const t = s.replace(/[+−]+$/, '');
+  return t.split(/(?=[+−])/).reduce((sum, tok) => sum + (tok[0] === '−' ? -1 : 1) * Number(tok.replace(/[^\d]/g, '') || 0), 0);
+}
+function fmtExpr(s) { return s.replace(/\d+/g, m => fmt(Number(m))).replace(/([+−])/g, ' $1 ').trim(); }
+function quickAmounts() {
+  const m = {};
+  S.entries.forEach(e => { if (e.tur === E.mode && e.kategoriya === E.cat && (!E.sub || e.sub === E.sub) && !(E.editId === e.id)) m[e.summa] = (m[e.summa] || 0) + 1; });
+  return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 4).map(x => +x[0]);
+}
+function openEntry(o) {
+  const c = catOf(o.mode, o.cat);
+  if (!c) return;
+  E = { mode: o.mode, cat: o.cat, sub: '', expr: '', note: '', date: today(), rec: false, excl: false, editId: null };
+  if (o.edit) {
+    const e = o.edit;
+    Object.assign(E, { sub: e.sub || '', expr: String(e.summa), note: e.izoh || '', date: e.sana, rec: !!e.takroriy, excl: !!e.hisobsiz, editId: e.id });
+  }
+  if (o.prefill) Object.assign(E, o.prefill);
+  const sh = $('#sheet'); sh.hidden = false;
+  sh.innerHTML = '<div class="sh-head"><button class="x" data-act="xEntry" aria-label="Yopish">✕</button><div class="t">' + esc(c.emoji) + ' ' + esc(c.nom) + (E.editId ? ' <span class="mute small">· tahrir</span>' : '') + '</div><span class="md">' + (E.mode === 'inc' ? 'Daromad' : 'Xarajat') + '</span></div>' +
+    '<div class="sh-body"><div class="amt" id="amtw"><span class="cur">₩</span><span class="v" id="amt">0</span></div><div class="expr num" id="expr"></div><div class="work" id="work"></div>' +
+    '<div class="chips" id="subs"></div><div class="quick" id="quick"></div>' +
+    '<input class="noteinp" id="note" placeholder="Izoh (ixtiyoriy)" maxlength="120" value="' + esc(E.note) + '" autocomplete="off">' +
+    '<div class="tools"><label class="tool" id="tdate"><span id="tdl">📅</span><input type="date" id="date" value="' + esc(E.date) + '"></label><button class="tool" id="trec" data-act="tRec">🔁 Takroriy</button><button class="tool" id="texc" data-act="tExc">🚫 Hisobsiz</button></div>' +
+    (E.editId ? '<button class="linkbtn" data-act="delEntry">🗑 O\'chirish</button>' : '') + '</div>' +
+    '<div class="pad">' + ['7', '8', '9', 'bs', '4', '5', '6', '+', '1', '2', '3', '−', '000', '0', 'C', 'ok'].map(k => '<button data-act="key" data-k="' + k + '" class="' + (k === 'ok' ? 'ok' : (k === '+' || k === '−' || k === 'bs' || k === 'C') ? 'op' : '') + '" aria-label="' + (k === 'ok' ? 'Saqlash' : k === 'bs' ? 'O\'chirish' : k) + '">' + (k === 'ok' ? '✓' : k === 'bs' ? '⌫' : k) + '</button>').join('') + '</div>';
+  $('#note').oninput = e => { E.note = e.target.value; };
+  $('#date').onchange = e => { E.date = e.target.value || today(); paintEntry(); };
+  if (tg && tg.BackButton) { tg.BackButton.show(); tg.BackButton.onClick(closeEntry); }
+  paintEntry();
+}
+function paintEntry() {
+  const c = catOf(E.mode, E.cat), amt = evalExpr(E.expr);
+  $('#amt').textContent = fmt(Math.max(0, amt));
+  $('#amtw').className = 'amt' + (amt < 0 ? ' bad' : '');
+  $('#expr').textContent = OPS.test(E.expr) ? fmtExpr(E.expr) : '';
+  $('#work').textContent = amt > 0 ? '≈ ' + workStr(amt) + (E.mode === 'inc' ? ' ish haqiga teng' : ' ishing') : '';
+  $('#subs').innerHTML = c.subs.map(s => '<button class="chip ' + (E.sub === s ? 'on' : '') + '" data-act="sub" data-s="' + esc(s) + '">' + esc(s) + '</button>').join('') + '<button class="chip dash" data-act="newSub">＋ yangi</button>';
+  const q = quickAmounts();
+  $('#quick').innerHTML = q.length ? '<span class="small mute">Odatdagi:</span>' + q.map(v => '<button class="chip" data-act="quick" data-v="' + v + '">' + fmt(v) + '</button>').join('') : '';
+  $('#trec').className = 'tool' + (E.rec ? ' on' : ''); $('#texc').className = 'tool' + (E.excl ? ' on' : '');
+  const t = today();
+  $('#tdl').textContent = '📅 ' + (E.date === t ? 'Bugun' : E.date === addDays(t, -1) ? 'Kecha' : +E.date.slice(8) + '-' + MONTHS[+E.date.slice(5, 7) - 1].toLowerCase());
+  $('#tdate').className = 'tool' + (E.date !== t ? ' on' : '');
+}
+function closeEntry() {
+  E = null; const sh = $('#sheet'); sh.hidden = true; sh.innerHTML = '';
+  if (tg && tg.BackButton) { tg.BackButton.hide(); tg.BackButton.offClick(closeEntry); }
+}
+function pressKey(k) {
+  haptic();
+  let x = E.expr;
+  const lastNum = () => (x.match(/\d+$/) || [''])[0];
+  if (/^\d$/.test(k)) { if (lastNum() === '0') x = x.slice(0, -1); if (lastNum().length < 10) x += k; }
+  else if (k === '000') { if (lastNum() && lastNum() !== '0' && lastNum().length <= 7) x += '000'; }
+  else if (k === 'bs') x = x.slice(0, -1);
+  else if (k === 'C') x = '';
+  else if (k === '+' || k === '−') { if (x && !/[+−]$/.test(x)) x += k; else if (x && /[+−]$/.test(x)) x = x.slice(0, -1) + k; }
+  else if (k === 'ok') return saveEntry();
+  E.expr = x; paintEntry();
+}
+function saveEntry() {
+  const amount = evalExpr(E.expr);
+  if (!(amount >= 1)) { haptic(); toast('Summani kiriting'); return; }
+  const c = catOf(E.mode, E.cat);
+  if (E.sub && c.subs.indexOf(E.sub) < 0) c.subs.push(E.sub);
+  const base = { tur: E.mode, summa: amount, kategoriya: E.cat, sub: E.sub, izoh: E.note.trim(), sana: E.date, hisobsiz: E.excl ? 1 : 0, takroriy: E.rec ? 1 : 0 };
+  let id;
+  if (E.editId) {
+    id = E.editId;
+    const e = S.entries.find(x => x.id === id);
+    if (e) Object.assign(e, base, { ish_daq: Math.round(amount / rate() * 60) });
+    queue('upd', Object.assign({ id }, base));
+  } else {
+    id = uid();
+    const entry = Object.assign({ id, vaqt: parts().time }, base);
+    S.entries.push(Object.assign({ ish_daq: Math.round(amount / rate() * 60) }, entry));
+    queue('add', entry);
+  }
+  persist(); haptic('ok');
+  const editing = !!E.editId, sign = E.mode === 'inc' ? '+' : '−';
+  const msg = '✓ ' + sign + won(amount) + ' · ' + E.cat + (E.sub ? ' › ' + E.sub : '') + ' · ≈ ' + workStr(amount);
+  closeEntry(); render();
+  if (!editing) toast(msg, () => { S.entries = S.entries.filter(e => e.id !== id); queue('del', { id }); persist(); render(); });
+  else toast('✓ Saqlandi');
+}
+
+/* ============================ HODISALAR ============================ */
+const A = {
+  tab(el) { S.tab = el.dataset.t; render(); window.scrollTo(0, 0); if (S.tab === 'budget') ensureFull().then(() => S.tab === 'budget' && render()); },
+  mode(el) { S.mode = el.dataset.m; render(); },
+  period(el) { S.period = el.dataset.p; render(); },
+  cat(el) { haptic(); openEntry({ mode: S.mode, cat: el.dataset.nom }); },
+  edit(el) { const e = S.entries.find(x => x.id === el.dataset.id); if (e && catOf(e.tur, e.kategoriya)) openEntry({ mode: e.tur, cat: e.kategoriya, edit: e }); },
+  xEntry() { closeEntry(); },
+  key(el) { pressKey(el.dataset.k); },
+  sub(el) { E.sub = E.sub === el.dataset.s ? '' : el.dataset.s; paintEntry(); },
+  async newSub() {
+    const v = await ask({ title: 'Yangi ichki tur', hint: E.cat === 'Berilgan qarz' || E.cat === 'Olingan qarz' ? 'Kimning ismi?' : 'Masalan: Poyabzal ta\'miri', ph: 'Nomi' });
+    if (v) { const c = catOf(E.mode, E.cat); const s = v.replace(/,/g, ' ').slice(0, 30); if (c.subs.indexOf(s) < 0) c.subs.push(s); E.sub = s; paintEntry(); }
+  },
+  quick(el) { E.expr = el.dataset.v; paintEntry(); },
+  tRec() { E.rec = !E.rec; paintEntry(); },
+  tExc() { E.excl = !E.excl; paintEntry(); },
+  delEntry() {
+    const id = E.editId, e = S.entries.find(x => x.id === id);
+    closeEntry(); S.entries = S.entries.filter(x => x.id !== id); queue('del', { id }); persist(); render();
+    toast('🗑 O\'chirildi', () => { if (e) { const back = { id: uid(), vaqt: e.vaqt, tur: e.tur, summa: e.summa, kategoriya: e.kategoriya, sub: e.sub, izoh: e.izoh, sana: e.sana, hisobsiz: e.hisobsiz, takroriy: 0 }; S.entries.push(Object.assign({ ish_daq: e.ish_daq }, back)); queue('add', back); persist(); render(); } });
+  },
+  async hours() {
+    const v = await ask({ title: 'Necha soat ishladingiz?', hint: '1 soat = ' + won(rate()), num: true, ph: 'Masalan: 6' });
+    const h = parseFloat(String(v || '').replace(',', '.'));
+    if (!(h > 0 && h <= 24)) return;
+    const summa = Math.round(h * rate()), entry = { id: uid(), vaqt: parts().time, tur: 'inc', summa, kategoriya: 'Ish haqi', sub: 'Ish soati', izoh: h + ' soat', sana: today(), hisobsiz: 0, takroriy: 0 };
+    S.entries.push(Object.assign({ ish_daq: Math.round(h * 60) }, entry)); queue('add', entry); persist(); render(); haptic('ok');
+    toast('✓ +' + won(summa) + ' · ' + h + ' soat ish');
+  },
+  mprev() { S.month = addMonth(S.month, -1); loadMonth(); },
+  mnext() { S.month = addMonth(S.month, 1); render(); },
+  async setBudget() {
+    const v = await ask({ title: 'Oylik erkin byudjet', hint: 'Ijara va qarzsiz, kundalik sarf uchun. 0 = o\'chirish', num: true, value: budget() || '', ph: '600000' });
+    if (v == null) return; const n = numOf(v); S.settings.oylik_byudjet = String(n); queue('set', { oylik_byudjet: n }); persist(); render();
+  },
+  async setRate() {
+    const v = await ask({ title: 'Soatlik stavka (₩)', num: true, value: rate(), ph: '13000' });
+    const n = numOf(v); if (!(n >= 100)) return; S.settings.soat_stavka = String(n); queue('set', { soat_stavka: n }); persist(); render();
+  },
+  async limit(el) {
+    const c = catOf('exp', el.dataset.nom); if (!c) return;
+    const v = await ask({ title: c.emoji + ' ' + c.nom + ' · oylik limit', hint: '0 = limitsiz', num: true, value: c.limit || '', ph: '200000' });
+    if (v == null) return; c.limit = numOf(v); queue('cat', { tur: 'exp', nom: c.nom, limit: c.limit }); persist(); render();
+  },
+  wishAdd() {
+    const nom = $('#wn').value.trim(), summa = numOf($('#wa').value);
+    if (!nom || !(summa >= 1)) { toast('Nomi va narxini yozing'); return; }
+    const w = { id: uid(), sana: today(), nom, summa, holat: 'kutmoqda' };
+    S.wishes.push(w); queue('wishAdd', w); persist(); render(); toast('Yozib qo\'ydim · ' + workStr(summa) + ' ish');
+  },
+  wishSkip(el) { const w = S.wishes.find(x => x.id === el.dataset.id); if (!w) return; w.holat = 'voz'; queue('wishSet', { id: w.id, holat: 'voz' }); persist(); render(); haptic('ok'); toast('Barakalla! ' + won(w.summa) + ' tejaldi'); },
+  wishBuy(el) {
+    const w = S.wishes.find(x => x.id === el.dataset.id); if (!w) return;
+    w.holat = 'olindi'; queue('wishSet', { id: w.id, holat: 'olindi' }); persist();
+    S.tab = 'home'; S.mode = 'exp'; render();
+    openEntry({ mode: 'exp', cat: 'Xarid', prefill: { expr: String(w.summa), note: w.nom } });
+  },
+  recOff(el) { S.recurring = S.recurring.filter(r => r.id !== el.dataset.id); queue('subOff', { id: el.dataset.id }); persist(); render(); },
+  sheet() { if (tg && tg.openLink) tg.openLink(S.sheetUrl); else window.open(S.sheetUrl, '_blank'); },
+  async sync() { toast('Yangilanmoqda…'); await boot(S.full ? '2000-01-01' : undefined); toast('✓ Yangilandi'); },
+  demoReset() { try { localStorage.removeItem('tanga_demo'); } catch (e) {} demo.db = null; boot(); }
+};
+async function loadMonth() {
+  if (!S.full && S.from && S.month + '-01' < S.from) { render(); await boot(S.month + '-01'); }
+  else render();
+}
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-act]');
+  if (el && A[el.dataset.act]) A[el.dataset.act](el, ev);
+});
+document.addEventListener('input', ev => {
+  if (ev.target.id === 'q') { S.q = ev.target.value; const b = $('#listbody'); if (b) b.innerHTML = vListBody(); }
+});
+
+/* ============================ ISHGA TUSHIRISH ============================ */
+(function init() {
+  if (tg) {
+    try {
+      tg.ready(); tg.expand();
+      if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+      document.documentElement.dataset.theme = tg.colorScheme === 'dark' ? 'dark' : 'light';
+      const bg = tg.colorScheme === 'dark' ? '#14171A' : '#F3EFE6';
+      tg.setHeaderColor && tg.setHeaderColor(bg); tg.setBackgroundColor && tg.setBackgroundColor(bg);
+    } catch (e) {}
+  }
+  outbox = lsGet('tanga_outbox', []);
+  const c = lsGet('tanga_cache', null);
+  if (c && !DEMO) { Object.assign(S, { cats: c.cats, entries: c.entries, settings: Object.assign(S.settings, c.settings), recurring: c.recurring || [], wishes: c.wishes || [], marks: c.marks || [], tz: c.tz || S.tz, sheetUrl: c.sheetUrl || '', from: c.from || '' }); applyOutbox(); S.ready = true; }
+  render();
+  boot();
+})();
+</script>
+</body>
+</html>
